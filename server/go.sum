@@ -1,0 +1,8 @@
+github.com/starius/kuznyechik v0.0.0-20170219141716-b5b5e952fe24 h1:qeTp/TKWtHibNKPD30HilOwAsVQ0IRMh7RrDTUHC7mo=
+github.com/starius/kuznyechik v0.0.0-20170219141716-b5b5e952fe24/go.mod h1:tFQGsdfi2efK/CNyJqx7BuBhknPpUg+XklT+LZTTJtM=
+github.com/symbolicsoft/kyber-k2so v0.2.3 h1:noHVou69a9V/oL72YPp4huh+xkvkUUvKhL+B5/s5I0U=
+github.com/symbolicsoft/kyber-k2so v0.2.3/go.mod h1:9zjkh1uhFZIg2G5j/iN5rpxOEHPZL2W7kbxQqYGeOIs=
+golang.org/x/crypto v0.17.0 h1:r8bRNjWL3GshPW3gkd+RpvzWrZAwPS49OmTGZ/uhM4k=
+golang.org/x/crypto v0.17.0/go.mod h1:gCAAfMLgwOJRpTjQ2zCCt2OcSfYMTeZVSRtQlPC7Nq4=
+golang.org/x/sys v0.15.0 h1:h48lPFYpsTvQJZF4EKyI4aLHaev3CxivZmv7yZig9pc=
+golang.org/x/sys v0.15.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
