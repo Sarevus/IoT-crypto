@@ -18,7 +18,6 @@ import (
 )
 
 const (
-	// Размеры ключей и ciphertext (для выбранной реализации Kyber‑512)
 	PublicKeySize    = 800  // публичный ключ клиента
 	SecretKeySize    = 2400 // секретный ключ (генерируется клиентом)
 	CiphertextSize   = 768  // размер капсулы (ciphertext) для Kyber‑512 (Krystal‑512)
@@ -26,7 +25,9 @@ const (
 	NonceSize        = 12   // размер nonce для Kuznyechik-GCM (обычно 12 байт)
 )
 
-// encryptKuznyechikGCM шифрует сообщение с использованием Kuznyechik в режиме GCM.
+
+
+// шифровка.
 func encryptKuznyechikGCM(key, plaintext []byte) (nonce, ciphertext []byte, err error) {
 	block, err := kuznyechik.NewCipher(key)
 	if err != nil {
@@ -44,7 +45,9 @@ func encryptKuznyechikGCM(key, plaintext []byte) (nonce, ciphertext []byte, err 
 	return nonce, ciphertext, nil
 }
 
-// decryptKuznyechikGCM дешифрует сообщение с использованием Kuznyechik в режиме GCM.
+
+
+//дешифровка.
 func decryptKuznyechikGCM(key, nonce, ciphertext []byte) ([]byte, error) {
 	block, err := kuznyechik.NewCipher(key)
 	if err != nil {
@@ -57,13 +60,14 @@ func decryptKuznyechikGCM(key, nonce, ciphertext []byte) ([]byte, error) {
 	return gcm.Open(nil, nonce, ciphertext, nil)
 }
 
-// sendMessage шифрует и отправляет сообщение через соединение.
+
+
+//отправка.
 func sendMessage(conn net.Conn, key []byte, message string) error {
 	nonce, cipherText, err := encryptKuznyechikGCM(key, []byte(message))
 	if err != nil {
 		return err
 	}
-	// Отправляем: nonce, 4-байтную длину ciphertext и сам ciphertext.
 	if _, err := conn.Write(nonce); err != nil {
 		return err
 	}
@@ -78,7 +82,9 @@ func sendMessage(conn net.Conn, key []byte, message string) error {
 	return nil
 }
 
-// readMessage читает зашифрованное сообщение, дешифрует его и возвращает строку.
+
+
+//принятие.
 func readMessage(conn net.Conn, key []byte) (string, error) {
 	nonce := make([]byte, NonceSize)
 	if _, err := io.ReadFull(conn, nonce); err != nil {
@@ -101,7 +107,6 @@ func readMessage(conn net.Conn, key []byte) (string, error) {
 }
 
 func main() {
-	// Сервер слушает TCP-порт 9000
 	ln, err := net.Listen("tcp", ":9000")
 	if err != nil {
 		log.Fatal(err)
@@ -113,8 +118,6 @@ func main() {
 	}
 	defer conn.Close()
 	fmt.Println("Сервер: Клиент подключился.")
-
-	// 1. Получаем публичный ключ, отправленный клиентом (800 байт)
 	clientPubKeySlice := make([]byte, PublicKeySize)
 	if _, err := io.ReadFull(conn, clientPubKeySlice); err != nil {
 		log.Fatal(err)
@@ -122,8 +125,6 @@ func main() {
 	var clientPubKey [PublicKeySize]byte
 	copy(clientPubKey[:], clientPubKeySlice)
 	fmt.Println("Сервер: Получен публичный ключ от клиента.")
-
-	// 2. Выполняем encapsulation: генерируем капсулу и общий секрет.
 	startEnc := time.Now()
 	kemCiphertext, sharedSecret, err := kyber.KemEncrypt512(clientPubKey)
 	if err != nil {
@@ -131,21 +132,17 @@ func main() {
 	}
 	encDuration := time.Since(startEnc)
 	fmt.Printf("Сервер: Encapsulation выполнена за %v\n", encDuration)
-
-	// 3. Отправляем капсулу клиенту (768 байт)
 	if _, err := conn.Write(kemCiphertext[:]); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Сервер: Капсула отправлена клиенту.")
-
-	// 4. Дополнительно отправляем зашифрованное сообщение о успешном подключении.
 	message := []byte("Подключение удалось!")
-	key := sharedSecret[:] // общий секрет используется как симметричный ключ
+	key := sharedSecret[:] 
 	nonce, cipherText, err := encryptKuznyechikGCM(key, message)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Отправляем: nonce (12 байт), 4-байтную длину ciphertext и сам ciphertext.
+
 	if _, err := conn.Write(nonce); err != nil {
 		log.Fatal(err)
 	}
@@ -159,7 +156,6 @@ func main() {
 	}
 	fmt.Println("Сервер: Зашифрованное сообщение отправлено клиенту.")
 
-	// Запускаем горутину для чтения входящих сообщений от клиента.
 	go func() {
 		for {
 			msg, err := readMessage(conn, key)
@@ -171,7 +167,6 @@ func main() {
 		}
 	}()
 
-	// Основной цикл: ввод с консоли и отправка сообщений клиенту.
 	consoleReader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("Сервер (введите сообщение): ")
