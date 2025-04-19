@@ -16,15 +16,16 @@
 ### Установка
 
 Склонируйте репозиторий и перейдите в папку проекта:
-
+```bash
 git clone https://github.com/Sarevus/IoT-crypto.git
 cd IoT-crypto
-
+```
 
 Для использования библиотеки в своём проекте:
 
+```bash
 go get github.com/Sarevus/IoT-crypt
-
+```
 
 ## Лицензия
 
